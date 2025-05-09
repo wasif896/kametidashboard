@@ -186,12 +186,14 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
     weekly: false,
     monthly: false,
     yearly: false,
+    all : true,
   });
 
   const toggleFilter = () => setShowFilter(!showFilter);
 
   const handleCheckboxChange = async (option) => {
     // Update the state
+    setShowFilter(false);
     setFilterOptions((prev) => {
       const updatedFilters = {
         daily: false,
@@ -235,7 +237,20 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
       String(value).toLowerCase().includes(searchQuery)
     )
   );
+  const dropdownRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowFilter(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setShowFilter]);
   return (
     <>
       <div className="w-[100%] h-[100vh] flex justify-center items-center bg-black">
@@ -274,7 +289,7 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                                                  </button>
                      </div>
                      {showFilter && (
-        <div className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
+        <div   ref={dropdownRef} className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
           {Object.keys(filterOptions).map((option) => (
             <label key={option} className="block text-gray-700">
               <input

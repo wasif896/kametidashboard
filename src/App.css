@@ -10,6 +10,14 @@
     width: auto;
     height: auto;
 }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
 /* Add yellow background color to the rows in the top and bottom containers of DataGrid */
 .css-1uq4l08-MuiDataGrid-root .MuiDataGrid-container--top [role=row],
 .css-1uq4l08-MuiDataGrid-root .MuiDataGrid-container--bottom [role=row] {

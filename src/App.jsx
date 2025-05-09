@@ -22,7 +22,7 @@ function App() {
   
     // If currentUser is found, redirect to "/create"
     if (currentUser) {
-      return <Navigate to="/create" />;
+      return <Navigate to="/dashboard" />;
     }
   
     // If no currentUser, render the children components
@@ -33,16 +33,16 @@ function App() {
     <>
     <BrowserRouter>
     <Routes>
-    <Route path="/" element={<SignIn/>}/>
-    <Route path="/dashboard" element={<Dashboard/>}/>
-    <Route path="/userlist" element={<UserList/>}/>
-    <Route path="/Role-Access" element={<RoleAccess/>}/>
-    <Route path="/Kameties" element={<Kameties/>}/>
-    <Route path="/Payments" element={<Payment/>}/>
+    <Route path="/" element={<RequireAuthhome><SignIn/> </RequireAuthhome>}/>
+    <Route path="/dashboard" element={<RequireAuth><Dashboard/></RequireAuth>}/>
+    <Route path="/userlist" element={<RequireAuth><UserList/></RequireAuth>}/>
+    <Route path="/Role-Access" element={<RequireAuth><RoleAccess/></RequireAuth>}/>
+    <Route path="/Kameties" element={<RequireAuth><Kameties/></RequireAuth>}/>
+    <Route path="/Payments" element={<RequireAuth><Payment/></RequireAuth>}/>
     
-    <Route path="/settings" element={<Settings/>}/>
-    <Route path="/Forgot-Password" element={<ForgotPassword/>}/>
-    <Route path="/User-Kameti" element={<UserKameti/>}/>
+    <Route path="/settings" element={<RequireAuth><Settings/></RequireAuth>}/>
+    <Route path="/Forgot-Password" element={<RequireAuthhome><ForgotPassword/></RequireAuthhome>}/>
+    <Route path="/User-Kameti" element={<RequireAuth><UserKameti/></RequireAuth>}/>
 
 
 

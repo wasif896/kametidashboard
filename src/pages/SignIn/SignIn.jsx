@@ -153,15 +153,15 @@ export default function SignIn() {
     >
     {btnLoader ?  <ClipLoader size={24} color='white' /> :"Login"}
     </button>
-<h2 className="text-white absolute bottom-6">Powered by Avicenna Enterprise Solutions</h2>
+<h2  onClick={() => window.open('https://avicennaenterprise.com/', '_blank')} className="text-white absolute bottom-6 cursor-pointer hover:text-[#A87F0B]">Powered by Avicenna Enterprise Solutions</h2>
   </div>
   {screenwidth > 430 && (
   <div className="w-[50%] h-[100vh] flex justify-center items-center relative bg-gradient-to-t from-[#A87F0B] to-[#141111] ">
   <div className="absolute flex justify-center items-center top-0 left-0 right-0">
-    <div className="text-center mt-[95px]">
-      <h1 className="text-[40px] font-bold text-white">Welcome To Dashboard</h1>
+    <div className="text-center mt-[60px]">
+
       <div className="flex justify-center items-center">
-  <img src={kametilogo} alt="Kameti Logo" className="w-[25%] z-10" />
+  <img src={kametilogo} alt="Kameti Logo" className="w-[25%]  z-10" />
 </div>
     </div>
   </div>

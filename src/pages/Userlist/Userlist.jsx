@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { FaEye } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import adminicon from "../../images/auth/adminicon.png";
-
+import jsPDF from "jspdf";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { FaChevronDown } from "react-icons/fa";
 
@@ -38,7 +38,6 @@ import KametiesTable from "../../DataTable/KametiesTable";
 import create from "../../images/create.png";
 import Flag from "react-world-flags";
 import ReactCountryFlag from "react-country-flag";
-import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { FaSearch, FaFilter } from "react-icons/fa";
 
@@ -230,6 +229,7 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
 
   const handleCheckboxChange = async (option) => {
     // Update the state
+    setShowFilter(false);
     setFilterOptions((prev) => {
       const updatedFilters = {
         daily: false,
@@ -247,6 +247,7 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
       }
   
       return updatedFilters;
+     
     });
   };
   
@@ -328,65 +329,99 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
   };
       
   const handleExportPDF = async () => {
-  
     setDownloading((prev) => ({ ...prev, pdf: true }));
-
   
-
     try {
       const response = await axios.post(
         `${apiBaseUrl}getUsers`,
-        { data: "all" }, // Fetch all users
-        { headers: { Authorization: `Bearer ${token}` } }
+        { data: "all" },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-
+  
       if (response?.data?.status === true) {
         const allUsers = response?.data?.data?.users || [];
-
+  
         if (allUsers.length === 0) {
           alert("No data available to export.");
           return;
         }
-
-        generatePDF(allUsers); // Call function to create PDF
+  
+        generatePDF(allUsers);
       }
     } catch (error) {
       console.error("Error fetching users for PDF export:", error);
-    }finally{
-
-    setDownloading((prev) => ({ ...prev, pdf: false }));
-
-
+    } finally {
+      setDownloading((prev) => ({ ...prev, pdf: false }));
     }
   };
+  
   const generatePDF = (users) => {
     const doc = new jsPDF();
-
+  
     // Title
     doc.setFontSize(16);
     doc.text("User Data Report", 14, 15);
-
-    // Table Headers
-    const headers = [[ "Full Name", "Email", "Phone Number", "Created At"]];
-
-    // Table Rows
+  
+    // Table headers
+    const headers = [["Full Name", "Email", "Phone Number", "Created At"]];
+  
+    // Table body
     const data = users.map((user) => [
-        user.fullName,
-        user.email,
-        user.phoneNum,
-        new Date(user.created_at).toLocaleDateString(),
+      user.fullName || "N/A",
+      user.email || "N/A",
+      user.phoneNum || "N/A",
+      user.created_at
+        ? new Date(user.created_at).toLocaleDateString("en-GB", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        : "N/A",
     ]);
-
-    // ✅ Ensure autoTable is correctly used
+  
+    // Create table
     autoTable(doc, {
-        head: headers,
-        body: data,
-        startY: 20,
+      head: headers,
+      body: data,
+      startY: 25,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        overflow: 'linebreak',
+      },
+      headStyles: {
+        fillColor: [33, 150, 243], // blue
+        textColor: 255,
+        halign: "center",
+      },
+      bodyStyles: {
+        halign: "left",
+        textColor: [0, 0, 0],
+      },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 60 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 30 },
+      },
+      didDrawPage: function (data) {
+        doc.setFontSize(10);
+        doc.text(
+          `Page ${doc.internal.getNumberOfPages()}`,
+          data.settings.margin.left,
+          doc.internal.pageSize.height - 10
+        );
+      },
+      margin: { top: 25 },
     });
-
-    // Save PDF
+  
+    // Save
     doc.save("users_report.pdf");
-};
+  };
 
 const handleExportExcel = async () => {
   
@@ -460,6 +495,20 @@ const generateExcel = (users) => {
       <span>N/A</span>
     );
   };
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowFilter(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setShowFilter]);
 
   return (
     <>
@@ -509,7 +558,7 @@ const generateExcel = (users) => {
 
       {/* Filter Options */}
       {showFilter && (
-        <div className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
+        <div   ref={dropdownRef} className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
           {Object.keys(filterOptions).map((option) => (
             <label key={option} className="block text-gray-700">
               <input
@@ -601,22 +650,19 @@ const generateExcel = (users) => {
     </div>
 
     {/* Table */}
+   
+    <div className="w-full bg-black overflow-x-auto ">
     <table className="w-full text-left text-white sm:w-[100%] w-[900px] min-h-[200px]">
       <thead className="bg-[#A87F0B] text-white">
         <tr>
-          <th className="py-2 px-4">Sr #</th>
-          <th className="py-2 px-4">Name</th>
-          <th className="py-2 px-4">Email</th>
-          <th className="py-2 px-4">Phone</th>
-          <th
-            className="py-2 px-4 cursor-pointer flex items-center gap-1"
-            onClick={handleSortByDate}
-          >
-            Create Date{" "}
-            {sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />}
-          </th>
-          <th className="py-2 px-4">Country</th>
-          <th className="py-2 px-4">Action</th>
+          <th className="py-2 px-4 text-[14px]">Sr #</th>
+          <th className="py-2 px-4 text-[14px]">Name</th>
+          <th className="py-2 px-4 text-[14px]">Email</th>
+          <th className="py-2 px-4 text-[14px]">Phone</th>
+          <th className="py-2 px-4 text-[14px]">Create Date</th>
+          <th className="py-2 px-4 text-[14px]">Country</th>
+          <th className="py-2 px-4 text-[14px]">Last Login</th>
+          <th className="py-2 px-4 text-[14px]">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -635,30 +681,47 @@ const generateExcel = (users) => {
               className="border-t border-gray-600 bg-black h-[20px] min-h-[50px] text-sm md:text-base"
               style={{ height: "20px", minHeight: "30px" }}
             >
-              <td className="py-2 px-4 md:px-4">
+              <td className="py-2 px-4 text-[14px] md:px-4">
                 {(currentPage - 1) * perPage + (index + 1)}
               </td>
-              <td className="py-2 px-4 md:px-4">
-                {kameti.fullName ? kameti.fullName : "N/A"}
+              <td className="py-2 px-4 text-[14px] md:px-4">
+              {kameti.fullName
+                ? kameti.fullName.charAt(0).toUpperCase() + kameti.fullName.slice(1)
+                : "--"}
+              
               </td>
-              <td className="py-2 px-4 md:px-4">
-                {kameti.email ? kameti.email : "N/A"}
+              <td className="py-2 px-4 text-[14px] md:px-4">
+                {kameti.email ? kameti.email : "--"}
               </td>
-              <td className="py-2 px-4 md:px-4">
-                {kameti.phoneNum ? kameti.phoneNum : "N/A"}
+              <td className="py-2 px-4 text-[14px] md:px-4">
+                {kameti.phoneNum ? kameti.phoneNum : "--"}
               </td>
-              <td className="py-2 px-4 md:px-4">
+              <td className="py-2 px-4 text-[14px] md:px-4">
                 {kameti.created_at
                   ? new Date(kameti.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
                     })
-                  : "N/A"}
+                  : "--"}
               </td>
-              <td className="py-2 px-4 md:px-4 ">
-                {kameti.country ? <CountryFlag country={kameti.country} /> : "N/A"}
+              <td className="py-2 px-4 text-[14px] md:px-4 ">
+                {kameti.country ? <CountryFlag country={kameti.country} /> : "--"}
               </td>
+              <td className="py-2 px-4 text-[14px] md:px-4">
+              {kameti.lastLogin
+                ? new Date(kameti.lastLogin).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                  })
+                : "--"}
+              
+            </td>
               <td className="py-2 px-4 md:px-4">
                 <button
                   onClick={() => handleDleteModalOpen(kameti?.id)}
@@ -670,14 +733,17 @@ const generateExcel = (users) => {
             </tr>
           ))
         ) : (
-          <tr>
-            <td colSpan="5" className="text-center py-4 text-gray-400">
-              No records found
-            </td>
-          </tr>
+        <tr>
+  <td colSpan="7" className="text-center align-middle py-12 text-gray-400">
+    No records found
+  </td>
+</tr>
+
+
         )}
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 

@@ -1,7 +1,8 @@
-import { Box, Modal } from "@mui/material";
 import React from "react";
+import { Box, Modal, Button, Typography } from "@mui/material";
 import { ReactCrop } from "react-image-crop";
-import 'react-image-crop/dist/ReactCrop.css'
+import "react-image-crop/dist/ReactCrop.css";
+
 const Cropper = ({
   cropModal,
   handleclosecropper,
@@ -12,23 +13,20 @@ const Cropper = ({
   crop,
   aspect,
   setReduxState,
-  isSettings,
   isCircle,
-  isgroup,
 }) => {
-
-
   const getProfileCropImage = async () => {
+
+
     const canvas = document.createElement("canvas");
     const scaleX = myimg.naturalWidth / myimg.width;
     const scaleY = myimg.naturalHeight / myimg.height;
-    canvas.width = crop.width;
-    canvas.height = crop.height;
+    const pixelRatio = window.devicePixelRatio;
+
+    canvas.width = crop.width * scaleX;
+    canvas.height = crop.height * scaleY;
     const ctx = canvas.getContext("2d");
 
-    const pixelRatio = window.devicePixelRatio;
-    canvas.width = crop.width * pixelRatio;
-    canvas.height = crop.height * pixelRatio;
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.imageSmoothingQuality = "high";
 
@@ -40,114 +38,133 @@ const Cropper = ({
       crop.height * scaleY,
       0,
       0,
-      crop.width,
-      crop.height
+      canvas.width / pixelRatio,
+      canvas.height / pixelRatio
     );
 
-    // Converting to base64
-    const base64Image = canvas.toDataURL("image/jpeg");
-    // setprofileImagePath(base64Image)
-   
-      setReduxState(base64Image);
-  
-
-    // setOutput(base64Image);
-    // setsaveImageIcon(true)
-    handleclosecropper();
+    canvas.toBlob(
+      (blob) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          const base64Image = reader.result;
+          setReduxState(base64Image);
+          handleclosecropper();
+        };
+      },
+      "image/jpeg",
+      1
+    );
   };
- 
 
-
-  const style2 = {
+  const modalStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    // width: "100%",
+    width: "90%",
+    maxWidth: "400px",
+    bgcolor: "white",
+    boxShadow: 24,
+    borderRadius: "16px",
+    overflow: "hidden",
+  };
+
+  const headerStyle = {
+    background: "#B08C2A",
+    color: "white",
+    p: 2,
+    textAlign: "center",
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
+  };
+
+  const cropperStyle = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    zIndex:30,
-    width: "300px",
-    // bgcolor: 'background.paper',
-    // border: '2px solid #000',
-    // boxShadow: 24,
-    // p: 2,
+    justifyContent: "center",
+    padding: "16px",
+    gap: "16px",
   };
 
   return (
-    <>
-      <Modal
-        open={cropModal}
-        onClose={handleclosecropper}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style2}>
+    <Modal
+      open={cropModal}
+      onClose={handleclosecropper}
+      aria-labelledby="crop-modal-title"
+      aria-describedby="crop-modal-description"
+    >
+      <Box sx={modalStyle}>
+        <Box sx={headerStyle}>
+          <Typography variant="h6" id="crop-modal-title">
+            Crop Your Image
+          </Typography>
+        </Box>
+        <Box sx={cropperStyle}>
           <ReactCrop
             crop={crop}
-            onChange={(c) => {
-              setcrop(c);
-            }}
+            onChange={(c) => setcrop(c)}
             circularCrop={isCircle}
             aspect={aspect}
-            style={{ maxHeight: '450px' }} 
+            style={{
+              maxHeight: "300px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "0 auto",
+            }}
           >
             <img
               src={theimg}
-              alt="img"
+              alt="Crop Preview"
               onLoad={(e) => setmyimg(e.target)}
               style={{
-               
-                // objectFit: "contain",
+                maxWidth: "100%",
+                maxHeight: "300px",
+                margin: "0 auto",
+                display: "block",
               }}
             />
           </ReactCrop>
-          <div
-            style={{
-              width: "50%",
+          <Box
+            sx={{
               display: "flex",
+              gap: "8px",
+              width: "100%",
               justifyContent: "center",
-              marginTop: "20px",
             }}
           >
-            <button
-              onClick={() => handleclosecropper()}
-              style={{
-                backgroundColor: "white",
-                outline: "none",
-                marginRight: "10px",
-                border: "none",
-                color: "black",
-                height: "40px",
-                width: "105px",
-                borderRadius: "20px",
-                cursor: "pointer",
+            <Button
+              variant="outlined"
+              onClick={handleclosecropper}
+              sx={{
+                flex: 1,
+                borderColor: "#000",
+                color: "#000",
+                height: "35px",
+                borderRadius: "5px",
               }}
-              className="hover: bg-gray-500"
             >
               Cancel
-            </button>
-            <button
-              onClick={() => getProfileCropImage()}
-              style={{
-                backgroundColor: "black",
-                outline: "none",
-                marginLeft: "10px",
-                border: "none",
-                color: "white",
-                height: "40px",
-                width: "105px",
-                borderRadius: "20px",
-                cursor: "pointer",
+            </Button>
+            <Button
+              variant="contained"
+              onClick={getProfileCropImage}
+              sx={{
+                flex: 1,
+                background: "#B08C2A",
+                "&:hover": { backgroundColor: "#a87f0b" },
+                height: "35px",
+                borderRadius: "5px",
               }}
             >
-              Crop
-            </button>
-          </div>
+              Save
+            </Button>
+          </Box>
         </Box>
-      </Modal>
-    </>
+      </Box>
+    </Modal>
   );
 };
 

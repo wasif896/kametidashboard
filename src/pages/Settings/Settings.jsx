@@ -71,7 +71,7 @@ export default function Settings() {
 
   let [tempimg, settempimg] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
   let handleImageChange = (event) => {
     // profileImage
     setProfile("");
@@ -84,6 +84,7 @@ export default function Settings() {
       reader.addEventListener("load", () => {
         setProfile(reader.result);
         setKey(key + 1);
+        setFileInputKey(Date.now());
         setcropModal(true);
       });
     } else {
@@ -105,6 +106,7 @@ export default function Settings() {
   const [edit, setEdit] = useState(false);
   const handleedit = () => {
     setEdit(!edit);
+    fetchAdminProfile();
   };
 
   const [delAccountAlert, setDelAccountAlert] = useState(false);
@@ -146,10 +148,22 @@ export default function Settings() {
   };
 
   const [isToggled, setIsToggled] = useState(false); // Track toggle state
-
+console.log(phone)
   const handleProfileUpdate = async (newValue, isToggleAction = false) => {
-    if (btnloader) return; // Prevent multiple clicks while loading
+    toast.dismiss();
 
+    if (btnloader) return; 
+    const phoneRegexWithPlus = /^\+92\d{10}$/;
+    const phoneRegexWithoutPlus = /^\d{11}$/;
+    
+    const cleanedPhone = phone?.toString().trim();
+    if(phone){
+    if (!phoneRegexWithPlus.test(cleanedPhone) && !phoneRegexWithoutPlus.test(cleanedPhone)) {
+      toast.error("Please enter a valid phone number. Use +92XXXXXXXXXX or 11-digit number.");
+      return;
+    }
+  }
+    
     setbtnloader(true); // Start loading state
 
     try {
@@ -410,7 +424,7 @@ export default function Settings() {
                       Change Password
                     </h2>
                   </div>
-
+  {/*
                   <div
                     onClick={() => setShowModal(true)}
                     style={{ boxShadow: "0px 0px 20px 0px #00000040" }}
@@ -422,7 +436,7 @@ export default function Settings() {
                       {t("Language")}
                     </h2>
                   </div>
-                  <div>
+                 */} <div>
                     {/* Language Selection Modal */}
                     {showModal && (
                       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -663,6 +677,7 @@ export default function Settings() {
                 </div>
                 <input
                   type="file"
+                  key={fileInputKey}
                   name="img"
                   id="img"
                   className="hidden"
@@ -718,19 +733,16 @@ export default function Settings() {
                   <AiFillLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white-500" />
                 </div>
                 <div className="relative bg-[#FFFFFF2B] w-full mt-5 rounded-[10px]">
-                  <input
-                    type="tel"
-                    placeholder="Phone"
-                    value={phone}
-                    onChange={(e) => {
-                      // Allow only numeric input
-                      const newPhone = e.target.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-                      if (newPhone.length <= 11) {
-                        setPhone(newPhone); // Update state only if the newPhone is valid
-                      }
-                    }}
-                    className="w-full outline-none rounded-[60px] h-[40px] pl-3 pr-10 bg-[#191717] text-[#FFFFFF]"
-                  />
+                <input
+  type="text"
+  placeholder="Phone"
+  value={phone}
+  onChange={(e) => {
+    let input = e.target.value;
+        setPhone(input);
+  }}
+  className="w-full outline-none rounded-[60px] h-[40px] pl-3 pr-10 bg-[#191717] text-[#FFFFFF]"
+/>
 
                   {/* <AiFillLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white-500" /> */}
                 </div>
@@ -774,7 +786,7 @@ export default function Settings() {
                 <div className="flex justify-center mt-5 items-center w-[100%]">
                   <button
                     onClick={handleedit}
-                    className="bg-[#5B5B5B] text-white py-2 px-4 w-[190px] h-[35px] flex justify-center items-center rounded-[10px] mr-2  transition duration-200"
+                    className="bg-[#5B5B5B] text-white py-2 px-4 w-[190px] h-[40px] flex justify-center items-center rounded-[10px] mr-2  transition duration-200"
                   >
                     Cancel
                   </button>
@@ -782,19 +794,18 @@ export default function Settings() {
                   <button
                     onClick={handleProfileUpdate}
                     disabled={btnloader} // Disables button while loading
-                    className="bg-[#A87F0B] text-white py-2 px-4 w-[190px] h-[35px] flex justify-center items-center rounded-[10px]  transition duration-200"
+                    className="bg-[#A87F0B] text-white py-2 px-4 w-[190px] h-[40px] flex justify-center items-center rounded-[10px]  transition duration-200"
                   >
-                    {btnloader ? (
-                      <div>
-                        <ClipLoader
-                          size={20}
-                          color="#181818"
-                          className="mt-2"
-                        />
-                      </div>
-                    ) : (
-                      "Update"
-                    )}
+                      {btnloader ? (
+                            <ClipLoader
+                            size={23}
+                          
+                        color='#ffffff'
+                            className=" mt-[1px] text-white"
+                          />
+                          ) : (
+                          "Update"
+                          )}
                   </button>
                 </div>
               </div>

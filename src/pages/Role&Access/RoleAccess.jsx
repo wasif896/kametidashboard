@@ -3,6 +3,7 @@ import { FaEdit, FaEye } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import adminicon from "../../images/auth/adminicon.png";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import { FaChevronDown } from "react-icons/fa";
 import "react-calendar/dist/Calendar.css";
 import "./Payment.css";
@@ -41,6 +42,7 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
   };
   const handleClose = () => {
     setOpenRoleModal(false);
+    setEdit(false);
     setUpdate(!update)
   }
     
@@ -153,7 +155,17 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
     setSearchQuery(e.target.value);
     fetchRoles(e.target.value); // Call fetchRoles with the search query
   };
-
+  const [sortKey, setSortKey] = useState("sort"); // default sort key
+  const [sortOrder, setSortOrder] = useState("asc"); // asc or desc
+  
+  const sortedRoles = [...roles].sort((a, b) => {
+    const valueA = a[sortKey]?.toLowerCase?.() || "";
+    const valueB = b[sortKey]?.toLowerCase?.() || "";
+  
+    if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
   
   return (
     <>
@@ -250,7 +262,7 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
                     </div>
                   )}
                 </div>
-                <div className="mt-1 mb-1 bg-[#2B2B2B] overflow-x-scroll pb-3 rounded-[8px] w-[100%] sm:w-[100%] border border-[#2b2b2b]">
+                <div className="mt-1 mb-1 bg-[#2B2B2B] overflow-x-scroll pb-3 rounded-[8px] w-[100%] sm:w-[100%]  border-[#2b2b2b]">
                   <div className="relative flex w-[100%] justify-end text-white">
                     <div
                       onClick={handleOpen}
@@ -258,9 +270,57 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
                     >
                       <span className="text-[13px] flex items-center">
                         <AiOutlinePlus className="text-white mr-2" />
-                        Create Roles
+                        Create User
                       </span>
                     </div>
+
+
+<div className=" flex items-center space-x-4 mr-2 border-white">
+  <FormControl variant="outlined" size="small" sx={{ minWidth: 110, }}>
+    <Select
+      value={sortKey}
+      onChange={(e) => setSortKey(e.target.value)}
+      MenuProps={{
+        PaperProps: {
+          sx: {
+            backgroundColor: '#1F1F1F', // ✅ menu background color
+            color: 'white',
+            fontSize: '12px',
+          },
+        },
+      }}
+      sx={{
+        color: "white",
+        height:'37px',
+     fontSize: '14px',
+     borderRadius:'7px',
+        backgroundColor: "#2B2B2B",
+        borderColor: "white",
+        '.MuiOutlinedInput-notchedOutline': {
+          borderColor: 'white',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'white',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'lightgray',
+        },
+        '& .MuiSvgIcon-root': {
+          color: 'white', // ✅ arrow color
+        },
+      }}
+    >
+    <MenuItem value="sort" disabled>
+    Sort
+  </MenuItem>
+      <MenuItem value="name">Name</MenuItem>
+      <MenuItem value="email">Email</MenuItem>
+      <MenuItem value="date">Date</MenuItem>
+      <MenuItem value="role">Role</MenuItem>
+    </Select>
+  </FormControl>
+</div>
+
                     {isOpen && (
                       <ul className="absolute right-0 mt-2 w-[130px] bg-[#2B2B2B] rounded-md shadow-md border border-gray-500">
                         {options.map((option) => (
@@ -280,13 +340,14 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
                     <table className="w-full text-left text-white sm:w-[100%] w-[900px] min-h-[200px]  ">
                       <thead className="bg-[#A87F0B] text-white">
                         <tr>
-                          <th className="py-2 px-4">User #</th>
-                          <th className="py-2 px-4">Joining Date</th>
-                          <th className="py-2 px-4">Name</th>
-                          <th className="py-2 px-4">Email</th>
-                          <th className="py-2 px-4">Phone</th>
-                          <th className="py-2 px-4">User Type</th>
-                          <th className="py-2 px-4">Action</th>
+                          <th className="py-2 px-4 text-[14px]">User #</th>
+                          <th className="py-2 px-4 text-[14px]">Joining Date</th>
+                          <th className="py-2 px-4 text-[14px]">Name</th>
+                          <th className="py-2 px-4 text-[14px]">Email</th>
+                          <th className="py-2 px-4 text-[14px]">Phone</th>
+                          <th className="py-2 px-4 text-[14px]">Description</th>
+                          <th className="py-2 px-4 text-[14px]">User Type</th>
+                          <th className="py-2 px-4 text-[14px]">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -299,14 +360,14 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
                               </div>
                             </td>
                           </tr>
-                        ) : roles.length > 0 ? (
-                          roles.map((user, index) => (
+                        ) : sortedRoles?.length > 0 ? (
+                          sortedRoles?.map((user, index) => (
                             <tr
                               key={user.id}
                               className="border-t border-gray-600 bg-black"
                             >
-                              <td className="py-2 px-4">{index + 1}</td>
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">{index + 1}</td>
+                              <td className="py-2 px-4 text-[14px]">
                                 {user.created_at
                                   ? new Date(
                                       user.created_at
@@ -317,10 +378,20 @@ export default function RoleAccess({ totalEntries = 12, entriesPerPage = 10 }) {
                                     })
                                   : "N/A"}
                               </td>
-                              <td className="py-2 px-4">{user.name}</td>
-                              <td className="py-2 px-4">{user.email}</td>
-                              <td className="py-2 px-4">{user.phone}</td>
-                              <td className="py-2 px-4">{user.type}</td>
+                              <td className="py-2 px-4 text-[14px]">{user.name}</td>
+                              <td className="py-2 px-4 text-[14px]">{user.email}</td>
+                              <td className="py-2 px-4 text-[14px]">{user.phone}</td>
+                              <td className="py-2 px-4 text-[14px]">{user.description}</td>
+                              <td className="py-2 px-4 ">
+                              <div className="bg-[#A87F0B] text-[14px] min-w-[100px] text-center p-1 rounded-lg">
+                              {user.type === "admin"
+                                ? "Admin"
+                                : user.type === "subadmin"
+                                ? "Sub Admin"
+                                : ""}
+                                </div>
+                            </td>
+                            
 
                               <td className="py-2 px-4 space-x-2">
                                 {/* <button className="text-blue-500 hover:text-blue-700">

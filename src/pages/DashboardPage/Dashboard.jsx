@@ -7,7 +7,7 @@ import { TbMenu2 } from "react-icons/tb";
 import MobileSidebar from "../../components/MobileSidebar/MobileSidebar";
 import more from "../../images/Frame 2085663857 (1).png";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { IconButton } from "@mui/material";
+import { IconButton, MenuItem, Select } from "@mui/material";
 import dayjs from "dayjs";
 import { FaCaretUp } from "react-icons/fa";
 import userImg from "../../images/Wallet.png"
@@ -126,11 +126,11 @@ const formatChartData = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState([dayjs("2023-11-23"), dayjs("2024-01-25")]);
   const userData = [
-    { title: "Total user", count: getAnalaytics?.analytic?.total_users, img:  userImg, description: "Last 30 days users",last30day:getAnalaytics?.analytic?.totalUsersLast30days },
-    { title: "Website Clicks", count: getAnalaytics?.analytic?.webClicks, img:  webImg, description: "Last 30 days users",last30day:0 },
-    { title: "iOS Insights", count:  getAnalaytics?.analytic?.ios_users, img: iosImg, description: "Last 30 days users",last30day:getAnalaytics?.analytic?.iosLast30Days},
-    { title: "Android Insights", count:  getAnalaytics?.analytic?.android_users, img:  androidImg, description: "Last 30 days users",last30day:getAnalaytics?.analytic?.androidLast30Days },
-    { title: "Web App Insights", count:  getAnalaytics?.analytic?.web_users, img: clickImg, description:"Last 30 days users",last30day:getAnalaytics?.analytic?.webLast30Days},
+    { title: "Total user", count: getAnalaytics?.analytic?.total_users, img:  userImg, description: "Last 30 days ",last30day:getAnalaytics?.analytic?.totalUsersLast30days },
+    // { title: "Website Clicks", count: getAnalaytics?.analytic?.webClicks, img:  webImg, description: "Last 30 days ",last30day:0 },
+    { title: "iOS Insights", count:  getAnalaytics?.analytic?.ios_users, img: iosImg, description: "Last 30 days ",last30day:getAnalaytics?.analytic?.iosLast30Days},
+    { title: "Android Insights", count:  getAnalaytics?.analytic?.android_users, img:  androidImg, description: "Last 30 days ",last30day:getAnalaytics?.analytic?.androidLast30Days },
+    { title: "Web App Insights", count:  getAnalaytics?.analytic?.web_users, img: clickImg, description:"Last 30 days ",last30day:getAnalaytics?.analytic?.webLast30Days},
   ];
   return (
     <>
@@ -176,7 +176,7 @@ const formatChartData = () => {
 
 <div className="flex justify-between w-[100%] flex-wrap  sm:w-[100%]">
 {userData.map((data, index) => (
-  <div key={index} className="sm:w-[19%] w-[49%] sm:mb-0 mb-4 p-2 bg-white text-center border rounded-lg shadow-lg">
+  <div key={index} className="sm:w-[24%] w-[49%]  sm:mb-0 mb-4 p-2 bg-white text-center border rounded-lg shadow-lg">
     <div className="flex justify-between items-center">
       <div>
         <p className="text-sm text-gray-500">{data.title}</p>
@@ -186,7 +186,7 @@ const formatChartData = () => {
         <img src={data.img} alt="More" className="w-10 h-10 cursor-pointer" />
       </div>
     </div>
-    <p className="text-[13px] text-gray-500 flex items-center "><span className="text-[#45B369]">+{data?.last30day}</span>{data.description}</p>
+    <p className="text-[13px] text-gray-500 flex items-center "><span className="text-[#45B369] mr-1">+{data?.last30day}</span> {data.description}</p>
   </div>
 ))}
 </div>
@@ -201,17 +201,17 @@ const formatChartData = () => {
                         htmlFor="timeframe-select"
                         className="text-gray-600 font-medium"
                       ></label>
-                      <select
-                        id="timeframe-select"
-                        value={selectedOption}
-                        onChange={handleChange}
-                        className="p-2 text-sm border border-gray-300 rounded-md"
-                      >
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                      </select>
+                      <Select
+                  
+                      value={selectedOption}
+                    className="h-[40px] w-[120px]"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value="daily">Daily</MenuItem>
+                      <MenuItem value="weekly">Weekly</MenuItem>
+                      <MenuItem value="monthly">Monthly</MenuItem>
+                      <MenuItem value="yearly">Yearly</MenuItem>
+                    </Select>
                     </div>
                   </div>
                   {screenLoader ? (

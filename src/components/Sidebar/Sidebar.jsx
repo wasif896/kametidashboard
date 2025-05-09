@@ -87,28 +87,30 @@ export default function Sidebar() {
         </div>
         <p className='text-white ml-4 text-[18px]'>Dasboard</p>
       </div>
-      <div className={`w-[100%] h-[65px] mt-5 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/userlist', 'bg-sidecircle', '') ? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/userlist')}>
+      <div className={`w-[100%] h-[65px] mt-0 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/userlist', 'bg-sidecircle', '') ? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/userlist')}>
         <div className={` w-[45px] h-[45px] rounded-[50%] justify-center flex items-center`}>
           <img className='w-[45px]' src={payment} />
         </div>
         <p className='text-white ml-4 text-[18px]'>Users List</p>
       </div>
 
-      <div className={`w-[100%] h-[65px] mt-5 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/Kameties', 'bg-sidecircle', '')? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/Kameties')}>
+      <div className={`w-[100%] h-[65px] mt-0 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/Kameties', 'bg-sidecircle', '')? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/Kameties')}>
         <div className={`w-[45px] h-[45px] rounded-[50%] justify-center flex items-center`}>
           <img className='w-[45px]' src={create} />
         </div>
         <p className='text-white ml-4 text-[18px]'>Kameties</p>
       </div>
-      <div className={`w-[100%] h-[65px] mt-5 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/Payments', 'bg-sidecircle', '')? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/Payments')}>
+      {/* 
+      <div className={`w-[100%] h-[65px] mt-0 bg-sidebar pl-7 flex items-center cursor-pointer ${isActive('/Payments', 'bg-sidecircle', '')? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`} onClick={() => handleNavigation('/Payments')}>
         <div className={`w-[45px] h-[45px] rounded-[50%] justify-center flex items-center`}>
           <img className='w-[45px]' src={payment2} />
         </div>
         <p className='text-white ml-4 text-[18px]'>Payments</p>
       </div>
+      */}
       {!(roleType === 'manager' || roleType === 'subadmin') && (
   <div
-    className={`w-[100%] h-[65px] mt-5 bg-sidebar pl-7 flex items-center cursor-pointer ${
+    className={`w-[100%] h-[65px] mt-0 bg-sidebar pl-7 flex items-center cursor-pointer ${
       isActive('/Role-Access', 'bg-sidecircle', '') ? 'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''
     }`}
     onClick={() => handleNavigation('/Role-Access')}
@@ -120,7 +122,7 @@ export default function Sidebar() {
   </div>
 )}
       <div 
-      className={`w-[100%] h-[65px] mt-5 bg-sidebar pl-7 flex items-center cursor-pointer 
+      className={`w-[100%] h-[65px] mt-0 bg-sidebar pl-7 flex items-center cursor-pointer 
       ${isActive(['/settings', '/delete', '/allrecords','/privacyPolicy'], 'bg-sidecircle', '') ? 
         'bg-sidecircle shadow-[inset_-2px_-9px_17.6px_0px_#0000004D]' : ''}`}
       onClick={() => handleNavigation('/settings')}

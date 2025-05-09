@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
 import { IoEyeOutline, IoEyeOffOutline, IoCloseOutline } from "react-icons/io5";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { ClipLoader } from "react-spinners";
+
 
 
 const ResetPasswordModal = ({ open, handleClose }) => {
@@ -30,17 +33,29 @@ const ResetPasswordModal = ({ open, handleClose }) => {
     const { name, value } = e.target;
     setPasswords((prev) => ({ ...prev, [name]: value }));
   };
-
+  const [btnLoader, setBtnLoader] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+  toast.dismiss()
     setSuccess("");
-  
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      setError("New password and confirm password do not match.");
+     
+    if (!passwords.oldPassword) {
+      toast.error("Current password field is required!");
       return;
     }
-  
+    if (!passwords.newPassword) {
+      toast.error("New password field is required!");
+      return;
+    }
+    if (!passwords.confirmPassword) {
+      toast.error("Confirm password field is required!");
+      return;
+    }
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error("New password and confirm password do not match.");
+      return;
+    }
+    setBtnLoader(true)
     try {
       console.log()
       const response = await axios.post(
@@ -57,12 +72,14 @@ const ResetPasswordModal = ({ open, handleClose }) => {
       );
   
       if (response.data.status) {
-        setSuccess("Password updated successfully.");
+        toast.success("Password updated successfully.");
+        setBtnLoader(false)
         setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
       }
     } catch (error) {
-      setError(error.response?.data?.message || "Something went wrong.");
+      toast.error(error.response?.data?.message || "Something went wrong.");
       console.log(error);
+      setBtnLoader(false)
     }
   };
   
@@ -150,6 +167,7 @@ const ResetPasswordModal = ({ open, handleClose }) => {
       <Button
         type="submit"
         fullWidth
+        disabled={btnLoader}
         sx={{
           backgroundColor: "#A87F0B",
           color: "white",
@@ -160,7 +178,16 @@ const ResetPasswordModal = ({ open, handleClose }) => {
           marginTop: 1,
         }}
       >
-        Update
+      {btnLoader ? (
+        <ClipLoader
+        size={23}
+      
+    color='#ffffff'
+        className=" mt-[1px] text-white"
+      />
+      ) : (
+      "Update"
+      )}
       </Button>
     </form>
       </Box>

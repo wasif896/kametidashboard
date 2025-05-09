@@ -180,6 +180,7 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
 
   const handleCheckboxChange = async (option) => {
     // Update the state
+    setShowFilter(false);
     setFilterOptions((prev) => {
       const updatedFilters = {
         daily: false,
@@ -224,7 +225,20 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
   const handleSortByDate = () => {
     setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   };
+  const dropdownRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowFilter(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setShowFilter]);
   return (
     <>
       <div className="w-[100%] h-[100vh] flex justify-center items-center bg-black">
@@ -265,7 +279,7 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                    
       {/* Filter Options */}
       {showFilter && (
-        <div className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
+        <div   ref={dropdownRef} className="absolute right-0 mt-2 p-3 bg-white shadow-md rounded-lg w-30">
           {Object.keys(filterOptions).map((option) => (
             <label key={option} className="block text-gray-700">
               <input
@@ -285,11 +299,11 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                     <table className="w-full text-left text-white sm:w-[100%] w-[900px] min-h-[200px]  ">
                       <thead className="bg-[#A87F0B] text-white">
                         <tr>
-                          <th className="py-2 px-4">Sr #</th>
-                          <th className="py-2 px-4">User</th>
-                          <th className="py-2 px-4">Kameti Holder</th>
+                          <th className="py-2 px-4 text-[14px]">Sr #</th>
+                          <th className="py-2 px-4 text-[14px]">User</th>
+                          <th className="py-2 px-4 text-[14px]">Kameti Holder</th>
                           <th
-                            className="py-2 px-4 cursor-pointer flex items-center gap-1"
+                            className="py-2 px-4 text-[14px] cursor-pointer flex items-center gap-1"
                             onClick={handleSortByDate}
                           >
                             Created at{" "}
@@ -300,10 +314,10 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                             )}
                           </th>
 
-                          <th className="py-2 px-4">Kameti Type</th>
+                          <th className="py-2 px-4 text-[14px]">Kameti Type</th>
 
-                          <th className="py-2 px-4">Total Price</th>
-                          <th className="py-2 px-4">Paid Amount</th>
+                          <th className="py-2 px-4 text-[14px]">Total Price</th>
+                          <th className="py-2 px-4 text-[14px]">Paid Amount</th>
                           {/* <th className="py-2 px-4">Action</th> */}
                         </tr>
                       </thead>
@@ -323,18 +337,18 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                               key={kameti.id}
                               className="border-t border-gray-600 bg-black"
                             >
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {(currentPage - 1) * perPage + (index + 1)}
                               </td>
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {kameti.user_name ? kameti.user_name : "N/A"}
                               </td>
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {kameti.commHolderName
                                   ? kameti.commHolderName
                                   : "N/A"}
                               </td>
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {kameti.created_at
                                   ? new Date(
                                       kameti.created_at
@@ -346,14 +360,14 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                                   : "N/A"}
                               </td>
                               
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {kameti.commType
                                   ? kameti.commType.charAt(0).toUpperCase() +
                                     kameti.commType.slice(1)
                                   : "N/A"}
                               </td>
 
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
   {kameti.totalPrice
     ? new Intl.NumberFormat("en-US", {
         minimumFractionDigits: 2,
@@ -364,10 +378,10 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
 
 
 
-                              <td className="py-2 px-4">
+                              <td className="py-2 px-4 text-[14px]">
                                 {kameti.paidAmount ? kameti.paidAmount : "N/A"}
                               </td>
-                              {/* <td className="py-2 px-4 flex space-x-2">
+                              {/* <td className="py-2 px-4 text-[14px] flex space-x-2">
             <button className="text-blue-500 hover:text-blue-700">
               <FaEye />
             </button>
@@ -383,13 +397,11 @@ export default function Kameties({ totalEntries = 12, entriesPerPage = 10 }) {
                           ))
                         ) : (
                           <tr>
-                            <td
-                              colSpan="5"
-                              className="text-center py-4 text-gray-400"
-                            >
-                              No records found
-                            </td>
-                          </tr>
+  <td colSpan="7" className="text-center align-middle py-12 text-gray-400">
+    No records found
+  </td>
+</tr>
+
                         )}
                       </tbody>
                     </table>

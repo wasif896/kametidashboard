@@ -12,7 +12,7 @@ import {
   IconButton,
 } from "@mui/material";
 import toast from "react-hot-toast";
-
+import { ClipLoader } from 'react-spinners';
 import axios from "axios";
 import { Close } from "@mui/icons-material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -41,6 +41,8 @@ const CreateRole = ({
   const [description, setDescription] = useState();
   const [roleType, setRoleType] = useState();
   const [errors, setErrors] = useState({});
+  const [btnLoader, setBtnLoader] = useState(false);
+
 
   const [roleId, setRoleId] = useState(null);
 
@@ -74,10 +76,40 @@ const CreateRole = ({
     setRoleType(event.target.value);
   };
 
-  // ✅ Handle Form Submission
+  const validateEmail = (email) => {
+    const emailRegEx = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+    return emailRegEx.test(email);
+  };
+  
   const handleSubmit = async () => {
     setErrors({}); // clear previous errors
 
+    toast.dismiss()
+ 
+    if(!roleName){
+      toast.error("Please enter Role Name.")
+      return;
+    }
+    if(!email){
+      toast.error("Please enter your Email.")
+      return;
+    }
+    if (!validateEmail(email)) {
+      toast.error("Invalid email format.");
+      return;
+    }
+    if(!password){
+      toast.error("Please enter your Password.")
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+    if(!roleType){
+      toast.error("Please select Role.")
+      return;
+    }
     const formData = {
       name: roleName,
       email: email,
@@ -87,8 +119,8 @@ const CreateRole = ({
     };
 
     // Determine the API endpoint based on roleType
-    const endpoint = roleType === "manager" ? "admin/manager" : "admin/role";
-
+    const endpoint = roleType === "subadmin" ? "create/admin" : `create/user`;
+    setBtnLoader(true)
     try { 
       const response = await axios.post(`${apiBaseUrl}${endpoint}`, formData, {
         headers: {
@@ -97,8 +129,8 @@ const CreateRole = ({
         },
       });
 
-      alert(response.data.message);
-
+      toast.success(response.data.message);
+      setBtnLoader(false)
       setRoleName("");
       setEmail("");
       setPassword("");
@@ -109,11 +141,38 @@ const CreateRole = ({
       fetchRoles();
     } catch (error) {
       console.error("Error creating role:", error);
-      setErrors(error.response?.data?.message || "Something went wrong!");
+      toast.error(error.response?.data?.message || "Something went wrong!");
+      setBtnLoader(false)
     }
   };
 
   const handleEditRole = async () => {
+    toast.dismiss()
+ 
+    if(!roleName){
+      toast.error("Please enter Role Name.")
+      return;
+    }
+    if(!email){
+      toast.error("Please enter your Email.")
+      return;
+    }
+    if (!validateEmail(email)) {
+      toast.error("Invalid email format.");
+      return;
+    }
+    if(!password){
+      toast.error("Please enter your Password.")
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+    if(!roleType){
+      toast.error("Please select Role.")
+      return;
+    }
     const formData = {
       name: roleName,
       email: email,
@@ -121,7 +180,7 @@ const CreateRole = ({
       description: description,
       type: roleType,
     };
-
+    setBtnLoader(true)
     try {
       const response = await axios.post(
         `${apiBaseUrl}admin/editrole/${roleId}`,
@@ -141,11 +200,10 @@ const CreateRole = ({
   
       // Show success toast
       toast.success("Role updated successfully!");
-  
-      console.log("Role Updated:", response.data);
+      setBtnLoader(false)
     } catch (error) {
       console.error("Error updating role:", error);
-  
+      setBtnLoader(false)
       // Optionally, show error toast if something goes wrong
       toast.error("Error updating role. Please try again.");
     }
@@ -160,7 +218,7 @@ const CreateRole = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          bgcolor: "white",
+          bgcolor: "#2B2B2B",
           borderRadius: 2,
           boxShadow: 24,
           width: screenwidth > 450 ? "50%" : "90%",
@@ -181,7 +239,7 @@ const CreateRole = ({
             color: "white",
           }}
         >
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" className="text-white" fontWeight="bold">
             Create New Role
           </Typography>
           <IconButton onClick={handleClose} sx={{ color: "white" }}>
@@ -193,7 +251,7 @@ const CreateRole = ({
 
         {/* Content */}
         <Box sx={{ p: 2 }}>
-          <Typography fontWeight="bold" mb={1}>
+          <Typography fontWeight="bold" className="text-white" mb={1}>
             Role Name
           </Typography>
           <TextField
@@ -204,8 +262,12 @@ const CreateRole = ({
   sx={{
     mb: 2,
     "& input": {
-      color: "black !important", // Force text color to remain black
+      color: "white !important", // Force text color to remain black
       backgroundColor: "transparent !important",
+      "&::placeholder": {
+        color: "#ffffff", // placeholder color
+          opacity: 0.7, // Ensure it's not faded
+      },
     },
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -221,7 +283,7 @@ const CreateRole = ({
     },
     "& input:-webkit-autofill": {
       WebkitBoxShadow: "0 0 0px 1000px white inset !important",
-      WebkitTextFillColor: "black !important",
+      WebkitTextFillColor: "white !important",
     },
   }}
   value={roleName}
@@ -237,7 +299,7 @@ const CreateRole = ({
   autoComplete="name"
 />
 
-          <Typography fontWeight="bold" mb={1}>
+          <Typography fontWeight="bold" className="text-white" mb={1}>
             Email
           </Typography>
           <TextField
@@ -249,8 +311,12 @@ const CreateRole = ({
             sx={{
               mb: 2,
               "& input": {
-                color: "black !important", // Force text color to remain black
+                color: "white !important", // Force text color to remain black
                 backgroundColor: "transparent !important",
+                "&::placeholder": {
+        color: "#ffffff", // placeholder color
+        opacity: 0.7, // Ensure it's not faded
+      },
               },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
@@ -266,7 +332,7 @@ const CreateRole = ({
               },
               "& input:-webkit-autofill": {
                 WebkitBoxShadow: "0 0 0px 1000px white inset !important",
-                WebkitTextFillColor: "black !important",
+                WebkitTextFillColor: "white !important",
               },
             }}
             value={email}
@@ -280,7 +346,7 @@ const CreateRole = ({
             }}
             autoComplete="email" // Ensures browser suggests email addresses
           />
-          <Typography fontWeight="bold" mb={1}>
+          <Typography fontWeight="bold" className="text-white" mb={1}>
             Password
           </Typography>
           <TextField
@@ -291,8 +357,12 @@ const CreateRole = ({
             sx={{
               mb: 2,
               "& input": {
-                color: "black !important", // Force text color to remain black
+                color: "white !important", // Force text color to remain black
                 backgroundColor: "transparent !important",
+                "&::placeholder": {
+        color: "#ffffff", // placeholder color
+          opacity: 0.7, // Ensure it's not faded
+      },
               },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
@@ -308,7 +378,7 @@ const CreateRole = ({
               },
               "& input:-webkit-autofill": {
                 WebkitBoxShadow: "0 0 0px 1000px white inset !important",
-                WebkitTextFillColor: "black !important",
+                WebkitTextFillColor: "white !important",
               },
             }}
             type={showPassword ? "text" : "password"}
@@ -318,7 +388,7 @@ const CreateRole = ({
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <VisibilityOff className="text-white" /> : <Visibility className="text-white" />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -326,45 +396,49 @@ const CreateRole = ({
             autoComplete="new-password" // Ensures correct autofill behavior
           />
 
-          <Typography fontWeight="bold" mb={1}>
+          <Typography fontWeight="bold" className="text-white" mb={1}>
             Description
           </Typography>
           <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Write some text"
-            multiline
-            rows={3}
-            size="small"
-            sx={{
-              mb: 2,
-              "& input": {
-                color: "black !important", // Force text color to remain black
-                backgroundColor: "transparent !important",
+          fullWidth
+          variant="outlined"
+          placeholder="Write some text"
+          multiline
+          rows={3}
+          size="small"
+          sx={{
+            mb: 2,
+            "& .MuiInputBase-root": {
+              color: "white", // text color
+            },
+            "& .MuiInputBase-root textarea": {
+              color: "white", // text color inside textarea
+              backgroundColor: "transparent",
+              "&::placeholder": {
+                color: "#ffffff",
+                  opacity: 0.7,
               },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "gray", // Default border color
-                },
-                "&:hover fieldset": {
-                  borderColor: "gray !important", // Remove hover effect
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "gray !important", // Remove blue focus border
-                  boxShadow: "none", // Remove focus shadow
-                },
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "gray",
               },
-              "& input:-webkit-autofill": {
-                WebkitBoxShadow: "0 0 0px 1000px white inset !important",
-                WebkitTextFillColor: "black !important",
+              "&:hover fieldset": {
+                borderColor: "gray !important",
               },
-            }}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            autoComplete="off" // Prevents autofill issues
-          />
+              "&.Mui-focused fieldset": {
+                borderColor: "gray !important",
+                boxShadow: "none",
+              },
+            },
+          }}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          autoComplete="off"
+        />
+        
 
-          <Typography fontWeight="bold">Status</Typography>
+          <Typography fontWeight="bold" className="text-white">Status</Typography>
           <RadioGroup
   row
   value={roleType}
@@ -373,12 +447,17 @@ const CreateRole = ({
 >
   <FormControlLabel
     value="subadmin"
-    control={<Radio sx={{ color: "black" }} />}
+    control={<Radio  sx={{
+      color: "white", // default (unselected) color
+      '&.Mui-checked': {
+        color: '#A87F0B', // color when selected
+      },
+    }}/>}
     label={
       <Typography
         sx={{
-          color: "black",
-          backgroundColor: "white",
+          color: "white",
+          backgroundColor: "transparent",
           px: 1,
           borderRadius: 1,
         }}
@@ -386,16 +465,24 @@ const CreateRole = ({
         SubAdmin
       </Typography>
     }
-    sx={{ backgroundColor: "white", borderRadius: 1, px: 1 }}
+    sx={{ backgroundColor: "transparent", borderRadius: 1, px: 1 }}
   />
   <FormControlLabel
     value="manager"
-    control={<Radio sx={{ color: "black" }} />}
+    control={<Radio
+      sx={{
+        color: "white", // default (unselected) color
+        '&.Mui-checked': {
+          color: '#A87F0B', // color when selected
+        },
+      }}
+    />
+     }
     label={
       <Typography
         sx={{
-          color: "black",
-          backgroundColor: "white",
+          color: "white",
+          backgroundColor: "transparent",
           px: 1,
           borderRadius: 1,
         }}
@@ -403,8 +490,33 @@ const CreateRole = ({
         Manager
       </Typography>
     }
-    sx={{ backgroundColor: "white", borderRadius: 1, px: 1 }}
+    sx={{ backgroundColor: "transparent", borderRadius: 1, px: 1 }}
   />
+  <FormControlLabel
+  value="user"
+  control={<Radio
+    sx={{
+      color: "white", // default (unselected) color
+      '&.Mui-checked': {
+        color: '#A87F0B', // color when selected
+      },
+    }}
+  />
+   }
+  label={
+    <Typography
+      sx={{
+        color: "white",
+        backgroundColor: "transparent",
+        px: 1,
+        borderRadius: 1,
+      }}
+    >
+      User
+    </Typography>
+  }
+  sx={{ backgroundColor: "transparent", borderRadius: 1, px: 1 }}
+/>
 </RadioGroup>
 
 
@@ -414,17 +526,18 @@ const CreateRole = ({
               onClick={handleClose}
               variant="outlined"
               sx={{
-                color: "black",
-                borderColor: "black",
+                color: "white",
+                borderColor: "white",
                 marginRight: 4,
                 width: "150px",
                 height: "40px",
-                "&:hover": { backgroundColor: "#f0f0f0" },
+                "&:hover": { backgroundColor: "#ffffff75" },
               }}
             >
               Cancel
             </Button>
             <Button
+            disabled={btnLoader}
               onClick={edit ? handleEditRole : handleSubmit}
               variant="contained"
               sx={{
@@ -434,7 +547,17 @@ const CreateRole = ({
                 "&:hover": { backgroundColor: "#8D6E1F" },
               }}
             >
-              {action === "edit" ? "Update" : "Save"}
+            {btnLoader ? (
+              <ClipLoader
+              size={23}
+            
+          color='#ffffff'
+              className=" mt-[1px] text-white"
+            />
+            ) : (
+              action === "edit" ? "Update" : "Save"
+            )}
+            
             </Button>
           </Box>
         </Box>

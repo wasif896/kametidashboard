@@ -168,7 +168,7 @@ export default function ForgotPassword() {
     
   return (
    <>
-<div className="flex bg-gradient-to-l from-[#A87F0B] to-[#000000] h-[100vh] justify-center items-center">
+<div className="flex bg-gradient-to-l from-[#A87F0B] to-[#000000] h-[100vh] overflow-hidden justify-center items-center">
   <div className="sm:w-[50%] w-[90%] h-[90vh] flex flex-col justify-center items-center">
     {/* Logo */}
 
